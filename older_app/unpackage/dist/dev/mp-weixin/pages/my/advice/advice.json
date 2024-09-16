@@ -1,0 +1,9 @@
+{
+  "navigationBarTitleText": "建议与意见",
+  "enablePullDownRefresh": false,
+  "usingComponents": {
+    "u-gap": "/node-modules/uview-ui/components/u-gap/u-gap",
+    "u--textarea": "/node-modules/uview-ui/components/u--textarea/u--textarea",
+    "u-button": "/node-modules/uview-ui/components/u-button/u-button"
+  }
+}

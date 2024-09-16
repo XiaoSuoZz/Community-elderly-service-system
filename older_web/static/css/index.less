@@ -1,0 +1,83 @@
+html {
+    width: 100%;
+    height: 100%;
+}
+body {
+    width: 100%;
+    height: 100%;
+    background-color: #fff;
+    color: #181818;
+}
+@color-gray: #ccc;
+@color-orange-light: #FFA500;
+@color-blue: #00b0ed;
+@color-blue-hover: #4cc8f2;
+@color-pink: #61474a;
+@color-green: #95F204;
+@color-green-deep: #03BF16;
+@color-purple: #C280FF;
+@color-orange: #FF8533;
+@color-disabled: #c8c9cc;
+@color-gantt-normal: rgba(75, 200, 241, .6);
+@color-gantt-done: rgba(149, 242, 4, .6);
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+#app {
+    width: 100%;
+    height: 100%;
+}
+
+.container {
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+    box-sizing: border-box;
+    .filter-container {
+        width: 100%;
+        display: flex;
+        justify-content: end;
+        // margin-top: 10px;
+      .filter-item {
+        margin-left: 10px;
+      }
+    }
+}
+.flex {
+  display: flex;
+}
+.flex-row {
+  flex-direction: row;
+}
+.flex-col {
+  flex-direction: column;
+}
+.flex-start {
+  justify-content: flex-start;
+}
+.flex-jc-end {
+  justify-content: flex-end;
+}
+.flex-jc-center {
+  justify-content: center;
+}
+.flex-jc-sp-around {
+  justify-content: space-around;
+}
+.flex-jc-sp-between {
+  justify-content: space-between;
+}
+.flex-jc-sp-evenly {
+  justify-content: space-evenly;
+}
+.flex-ai-center {
+  align-items: center;
+}
+.flex-ai-start {
+  align-items: flex-start;
+}
+.flex-ai-end {
+  align-items: flex-end;
+}

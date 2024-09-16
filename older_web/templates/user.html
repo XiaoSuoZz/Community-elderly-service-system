@@ -1,0 +1,536 @@
+{%extends "layout.html" %}
+<!-- 导航标记 -->
+{% block user %}active{% endblock %}
+{% block current-page %}用户管理{% endblock %}
+<!-- 内容区 -->
+{% block mainbody %}
+{% verbatim %}
+<div id="app" class="container">
+  <div class="content-wrapper">
+    <div class="filter-container">
+      <div class="filter-item" style="width: 160px;">
+        <el-input v-model="queryData.name" clearable placeholder="姓名" @clear="searchUserList" />
+      </div>
+      <div class="filter-item" style="width: 80px;">
+        <el-select v-model="queryData.sex" clearable placeholder="性别" @change="searchUserList">
+          <el-option key="0" label="男" value="0"></el-option>
+          <el-option key="1" label="女" value="1"></el-option>
+        </el-select>
+      </div>
+      <div class="filter-item" style="width: 80px;">
+        <el-input v-model="queryData.age" clearable placeholder="年纪" @clear="searchUserList"/>
+      </div>
+      <div class="filter-item" style="width: 110px;">
+        <el-select v-model="queryData.isMarry" clearable placeholder="婚姻状况" @change="searchUserList">
+          <el-option key="0" label="未婚" value="0"></el-option>
+          <el-option key="1" label="已婚" value="1"></el-option>
+        </el-select>
+      </div>
+      <div class="filter-item" style="width: 110px;">
+        <el-select v-model="queryData.isLiveAlone" clearable placeholder="独居状况" @change="searchUserList">
+          <el-option key="0" label="非独居" value="0"></el-option>
+          <el-option key="1" label="独居" value="1"></el-option>
+        </el-select>
+      </div>
+      <div class="filter-item" style="width: 110px;">
+        <el-select v-model="queryData.isDisability" clearable placeholder="残疾状况" @change="searchUserList">
+          <el-option key="0" label="健全" value="0"></el-option>
+          <el-option key="1" label="残疾" value="1"></el-option>
+        </el-select>
+      </div>
+      <div class="filter-item">
+        <el-button class="filter-item" type="primary" icon="el-icon-plus" @click="onAdd">添加</el-button>
+        <el-button class="filter-item" type="warning" icon="el-icon-search" @click="searchUserList">查询</el-button>
+      </div>
+    </div>
+    <el-table :data="user_list" style="width: 100%">
+      <el-table-column prop="name" label="姓名" width="100"></el-table-column>
+      <el-table-column :formatter="formatterSex" prop="sex" label="性别" width="50" align="center"></el-table-column>
+      <el-table-column prop="age" label="年龄" width="60" align="center"></el-table-column>
+      <el-table-column prop="birth_place_str" label="籍贯" width="100" align="center"></el-table-column>
+      <el-table-column align="left" label="居住地">
+        <template slot-scope="{ row }">
+          <div class="address-cell">
+            <div class="detail">{{ row.area_detail }}</div>
+            <div class="area">{{ row.area_str }}</div>
+          </div>
+        </template>
+      </el-table-column>
+      <el-table-column label="紧急联络人" width="120" align="center">
+        <template slot-scope="{ row }">
+          <el-popover
+            placement="bottom"
+            :title="row.emergency_contact_name"
+            width="200"
+            trigger="click">
+            <div>电话：{{row.emergency_contact_phone}}</div>
+            <div>关系：{{row.emergency_contact_relationship}}</div>
+            <el-button slot="reference" plain size="mini">{{ row.emergency_contact_name }}</el-button>
+          </el-popover>
+        </template>
+      </el-table-column>
+      <el-table-column label="未婚" width="60" align="center">
+        <template slot-scope="{ row }">
+          <i v-if="row.is_marry == 0" class="el-icon-check"></i>
+        </template>
+      </el-table-column>
+      <el-table-column label="独居" width="60" align="center">
+        <template slot-scope="{ row }">
+          <i v-if="row.is_live_alone == 1" class="el-icon-check"></i>
+        </template>
+      </el-table-column>
+      <el-table-column label="残疾" width="60" align="center">
+        <template slot-scope="{ row }">
+          <i v-if="row.is_disability == 1" class="el-icon-check"></i>
+        </template>
+      </el-table-column>
+      <el-table-column label="疾病史" width="120" align="center">
+        <template slot-scope="{ row }">
+          <el-popover
+            placement="bottom"
+            :title="row.name"
+            width="200"
+            trigger="click">
+            <span v-for="item in row.diseases_history">{{item}}  </span>
+            <el-button slot="reference" :disabled="row.diseases_history.length == 0" plain size="mini">{{ row.diseases_history.length }} 个</el-button>
+          </el-popover>
+        </template>
+      </el-table-column>
+      <el-table-column label="重大疾病史" width="120" align="center">
+        <template slot-scope="{ row }">
+          <el-popover
+            placement="bottom"
+            :title="row.name"
+            width="200"
+            trigger="click">
+            <span v-for="item in row.major_diseases_history">{{item}}  </span>
+            <el-button slot="reference" :disabled="row.major_diseases_history.length == 0" plain size="mini">{{ row.major_diseases_history.length }} 个</el-button>
+          </el-popover>
+        </template>
+      </el-table-column>
+      <el-table-column prop="care_level" label="关照等级" width="100" align="center">
+        <template slot-scope="{ row }">
+          <el-tag v-if="row.care_level" size="small" :color="row.care_css.color" effect="dark">{{row.care_css.name}}</el-tag>
+          <el-button v-else type="text" :disabled="row.care_levle" @click="onGardeCareLevel(row)">{{row.care_levle ? row.care_levle : '立即评级'}}</el-button>
+        </template>
+      </el-table-column>
+      <el-table-column align="right" label="操作" width="100">
+        <template slot-scope="{ row }">
+          <el-button type="text" @click="onShowDetail(row)">详情</el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+    <el-pagination ref="page" :total="page.total_count" :page-size="page.page_size" class="app-pagination"
+      layout="prev, pager, next, jumper"
+      hide-on-single-page
+      @current-change="onChangePage">
+    </el-pagination>
+  </div>
+  <!-- 表单 -->
+  <el-dialog :visible.sync="showAddUserForm">
+    <el-form ref="addUserForm" :model="addUserInfo" :rules="userRules" :disabled="addUserFormType == 1" label-width="90px" label-position="left" size="mini">
+      <div class="user-form-title">账户信息</div>
+      <el-row :gutter="50">
+        <el-col :span="12">
+          <el-form-item label="账户" prop="account">
+            <el-input v-model="addUserInfo.account"/>
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item v-if="!addUserFormType" label="密码" prop="password">
+            <el-input v-model="addUserInfo.password"/>
+          </el-form-item>
+        </el-col>
+      </el-row>
+      <div class="user-form-title">基本信息</div>
+      <el-row :gutter="50">
+        <el-col :span="12">
+          <el-form-item label="姓名" prop="name">
+            <el-input v-model="addUserInfo.name"/>
+          </el-form-item>
+          <el-form-item label="联系电话" prop="phone">
+            <el-input v-model="addUserInfo.phone"/>
+          </el-form-item>
+          <el-form-item label="性别" prop="sex">
+            <el-radio v-model="addUserInfo.sex" :label="0">男</el-radio>
+            <el-radio v-model="addUserInfo.sex" :label="1">女</el-radio>
+          </el-form-item>    
+          <el-form-item label="生日" prop="birthDate">
+            <el-date-picker v-model="addUserInfo.birthDate" type="date" placeholder="选择日期" value-format="yyyy-MM-dd"></el-date-picker>
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="籍贯" prop="birthPlace">
+            <el-select v-model="addUserInfo.birthPlace" placeholder="请选择">
+              <el-option v-for="item in provinceOptions" :key="item.code" :label="item.name" :value="item.code"></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="居住地址" prop="areaCode">
+            <el-cascader v-model="addUserInfo.areaCode" :props="areaProps"></el-cascader>
+          </el-form-item>
+          <el-form-item label="详细地址" prop="areaDetail">
+            <el-input v-model="addUserInfo.areaDetail"/>
+          </el-form-item>    
+        </el-col>
+      </el-row>
+      <div class="user-form-title">家庭信息</div>
+      <el-row :gutter="50">
+        <el-col :span="12">
+          <el-form-item label="婚姻状况" prop="isMarry">
+            <el-radio v-model="addUserInfo.isMarry" :label="0">未婚</el-radio>
+            <el-radio v-model="addUserInfo.isMarry" :label="1">已婚</el-radio>
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="是否独居" prop="isLiveAlone">
+            <el-radio v-model="addUserInfo.isLiveAlone" :label="0">否</el-radio>
+            <el-radio v-model="addUserInfo.isLiveAlone" :label="1">是</el-radio>
+          </el-form-item>
+        </el-col>
+      </el-row>
+      <div class="user-form-title">紧急联络人</div>
+      <el-row :gutter="50">
+        <el-col :span="12">
+          <el-form-item label="姓名" prop="emergencyContactName">
+            <el-input v-model="addUserInfo.emergencyContactName"/>
+          </el-form-item>
+          <el-form-item label="关系" prop="emergencyContactRelationship">
+            <el-input v-model="addUserInfo.emergencyContactRelationship"/>
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="联系电话" prop="emergencyContactPhone">
+            <el-input v-model="addUserInfo.emergencyContactPhone"/>
+          </el-form-item>
+        </el-col>
+      </el-row>
+      <div class="user-form-title">身体状况</div>
+      <el-row :gutter="50">
+        <el-col :span="12">
+          <el-form-item label="疾病史">
+            <div v-for="(diseases, index) in addUserInfo.diseasesHistory" class="diseases-input-wrapper">
+              <el-input v-model="diseases.content">
+                <template slot="append">
+                  <el-button icon="el-icon-delete" @click="onDeleteDiseasesHistory(index)"></el-button>
+                </template>
+              </el-input>
+            </div>
+            <el-button plain icon="el-icon-plus" style="width: 100%;" @click="onAddDiseasesHistory"></el-button>
+          </el-form-item>
+          <el-form-item label="是否残疾" prop="isDisability">
+            <el-radio v-model="addUserInfo.isDisability" :label="0">否</el-radio>
+            <el-radio v-model="addUserInfo.isDisability" :label="1">是</el-radio>
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="重大疾病史">
+            <div v-for="(diseases, index) in addUserInfo.majorDiseasesHistory" class="diseases-input-wrapper">
+              <el-input v-model="diseases.content">
+                <template slot="append">
+                  <el-button icon="el-icon-delete" @click="onDeleteMajorDiseasesHistory(index)"></el-button>
+                </template>
+              </el-input>
+            </div>
+            <el-button plain icon="el-icon-plus" style="width: 100%;" @click="onAddMajorDiseasesHistory"></el-button>
+          </el-form-item>
+        </el-col>
+      </el-row>
+      <div style="text-align: right;">
+        <el-button v-if="!addUserFormType" type="primary" @click="onSubmitUser">添加</el-button>
+      </div>
+    </el-form>
+  </el-dialog>
+</div>
+{% endverbatim %}
+<script>
+  let id = 0;
+  new Vue({
+    el: '#app',
+    data() {
+      return {
+        // 查询
+        queryData: {
+          name: '',
+          sex: '',
+          age: '',
+          isMarry: '',
+          isLiveAlone: '',
+          isDisability: ''
+        },
+        // 分页
+        page: {
+          page_index: 1,
+          page_size: 8,
+          total_count: 0
+        },
+        user_list: [],
+        // 关照等级
+        care_list: [
+          { id: 1, name: '一般关注', color: '#67C23A' },
+          { id: 2, name: '特别关注', color: '#409EFF' },
+          { id: 3, name: '重点关注', color: '#E6A23C' },
+          { id: 4, name: '特殊关注', color: '#F56C6C' },
+        ],
+        // 添加表单
+        showAddUserForm: false,
+        addUserFormType: 0, // 表单类型：0添加 1详情
+        addUserInfo: {
+          id: null, // id
+          account: null, // 账户
+          password: null, // 密码
+					name: null, // 姓名
+					phone: null, // 联系电话
+					birthDate: null, // 出生年月日
+					sex: 0, // 性别 0-男 1-女
+					isMarry: 1, // 是否结婚 0-否 1-是
+					isLiveAlone: 0, // 是否独居 0-否 1-是
+					isDisability: 0, // 是否残疾 0-否 1-是
+					diseasesHistory: [], // 疾病史
+					majorDiseasesHistory: [], // 重大疾病史
+					emergencyContactName: null, // 紧急联络人姓名
+					emergencyContactRelationship: null, // 与紧急联络人关系
+					emergencyContactPhone: null, // 紧急联络人电话
+					birthPlace: null, // 籍贯 (省id)
+					areaCode: null, // 现住地编号（精确到区县）
+					areaDetail: null, // 现住地详细地址
+        },
+        userRules: {
+          account: [{ required: true, message: '请输入账户', trigger: 'blur' }],
+          password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
+          name: [{ required: true, message: '请输入姓名', trigger: 'blur' }],
+          birthDate: [{ required: true, message: '请选择生日', trigger: 'change' }],
+          emergencyContactName: [{ required: true, message: '请输入姓名', trigger: 'blur' }],
+          emergencyContactRelationship: [{ required: true, message: '请输入关系', trigger: 'blur' }],
+          emergencyContactPhone: [{ required: true, message: '请输入电话', trigger: 'blur' }],
+          birthPlace: [{ required: true, message: '请选择籍贯', trigger: 'blur' }],
+          areaCode: [{ required: true, message: '请选择居住地', trigger: 'blur' }],
+          areaDetail: [{ required: true, message: '请输入详细地址', trigger: 'blur' }],
+        },
+        provinceOptions: [], // 省
+        areaProps: {
+          lazy: true,
+          lazyLoad (node, resolve) {
+            const { level, value } = node;
+            setTimeout(async () => {
+              const nodes = []
+              let opt = {
+                level: level + 1
+              }
+              if (value) {
+                opt.p_code = value
+              }
+              const ret = await serverPost(ToDJ('areaList'), opt)
+              if (ret.code === 0) {
+                const { list } = ret.data
+                for (const item of list) {
+                  nodes.push({
+                    value: item.code,
+                    label: item.name,
+                    leaf: level === 2
+                  })
+                }
+              }
+              resolve(nodes);
+            }, 100);
+          }
+        }
+      }
+    },
+    mounted() {
+      this.searchUserList()
+      this.initAreaDict()
+    },
+    methods: {
+      // 查询用户列表
+      searchUserList() {
+        this.page = {
+          page_index: 1,
+          page_size: 8,
+          total_count: 0
+        }
+        this.getUserList()
+      },
+      // 获取用户列表
+      async getUserList() {
+        const ret = await serverPost(ToDJ('userList'), Object.assign({}, this.page, this.queryData))
+        if (ret.code === 0) {
+          const { list, total_count } = ret.data
+          for (const item of list) {
+            item.diseases_history = !item.diseases_history ? [] : JSON.parse(item.diseases_history)
+            item.major_diseases_history = !item.major_diseases_history ? [] : JSON.parse(item.major_diseases_history)
+            item.care_css = this.formatterCare(item)
+          }
+          this.page.total_count = total_count
+          this.user_list = list
+        } else {
+          NotifyFail(this, ret.data)
+        }
+      },
+      // 翻页
+      onChangePage(index) {
+        this.page.page_index = index
+        this.getUserList()
+      },
+      // 提交表单
+      onSubmitUser() {
+        // 检查输入
+        this.$refs.addUserForm.validate(async (valid) => {
+          if (valid) {
+            let { account, password, name, phone, birthDate, sex, isMarry, isLiveAlone, isDisability, diseasesHistory, majorDiseasesHistory, emergencyContactName, emergencyContactRelationship, emergencyContactPhone, birthPlace, areaCode, areaDetail } = this.addUserInfo
+            diseasesHistory = JSON.stringify(diseasesHistory.map(item => item.content))
+            majorDiseasesHistory = JSON.stringify(majorDiseasesHistory.map(item => item.content))
+            areaCode = areaCode ? areaCode[2] : null
+            const para = {
+              account, password, name, phone, birthDate, sex, isMarry, isLiveAlone, isDisability, 
+              diseasesHistory, majorDiseasesHistory, 
+              emergencyContactName, emergencyContactRelationship, emergencyContactPhone, 
+              birthPlace, areaCode, areaDetail
+            }
+            const ret = await serverPost(ToDJ('userAdd'), para)
+            if (ret.code === 0) {
+              this.showAddUserForm = false
+              this.searchUserList()
+            } else {
+              NotifyFail(this, ret.data)
+            }
+          }
+        })
+      },
+      // 添加
+      onAdd() {
+        this.addUserInfo = {
+          id: null, // id
+          account: null, // 账户
+          password: null, // 密码
+					name: null, // 姓名
+					phone: null, // 联系电话
+					birthDate: null, // 出生年月日
+					sex: 0, // 性别 0-男 1-女
+					isMarry: 1, // 是否结婚 0-否 1-是
+					isLiveAlone: 0, // 是否独居 0-否 1-是
+					isDisability: 0, // 是否残疾 0-否 1-是
+					diseasesHistory: [], // 疾病史
+					majorDiseasesHistory: [], // 重大疾病史
+					emergencyContactName: null, // 紧急联络人姓名
+					emergencyContactRelationship: null, // 与紧急联络人关系
+					emergencyContactPhone: null, // 紧急联络人电话
+					birthPlace: null, // 籍贯 (省id)
+					areaCode: null, // 现住地编号（精确到区县）
+					areaDetail: null, // 现住地详细地址
+        }
+        this.addUserFormType = 0
+        this.showAddUserForm = true
+      },
+      // 显示详情
+      onShowDetail(row) {
+        console.log(row)
+        const { id, account, name, sex, birth_place_code, 
+          birth_place_str, area_code, area_str, area_detail, 
+          phone, emergency_contact_name, emergency_contact_phone, 
+          emergency_contact_relationship, is_marry, is_live_alone, 
+          is_disability, diseases_history, major_diseases_history, birthday, age } = row
+        this.addUserInfo = {
+          id, // id
+          account, // 账户
+          password: null, // 密码
+					name, // 姓名
+					phone: phone, // 联系电话
+					birthDate: birthday, // 出生年月日
+					sex, // 性别 0-男 1-女
+					isMarry: is_marry, // 是否结婚 0-否 1-是
+					isLiveAlone: is_live_alone, // 是否独居 0-否 1-是
+					isDisability: is_disability, // 是否残疾 0-否 1-是
+					diseasesHistory: diseases_history.map(item => {return { content: item }}), // 疾病史
+					majorDiseasesHistory: major_diseases_history.map(item => {return { content: item }}), // 重大疾病史
+					emergencyContactName: emergency_contact_name, // 紧急联络人姓名
+					emergencyContactRelationship: emergency_contact_relationship, // 与紧急联络人关系
+					emergencyContactPhone: emergency_contact_phone, // 紧急联络人电话
+					birthPlace: birth_place_code, // 籍贯 (省id)
+					areaCode: area_code, // 现住地编号（精确到区县）
+					areaDetail: area_detail, // 现住地详细地址
+        }
+        this.addUserFormType = 1
+        this.showAddUserForm = true
+      },
+      // 格式化显示性别 0/1 -> 男/女
+      formatterSex(row, column, cellValue, index) {
+        const sexMap = ['男', '女']
+        return sexMap[row.sex]
+      },
+      // 初始化地区字典
+      async initAreaDict() {
+        const para = {
+          level: 1
+        }
+        const ret = await serverPost(ToDJ('areaList'), para)
+        if (ret.code === 0) {
+          const { list } = ret.data
+          this.provinceOptions = list
+        } else {
+          NotifyFail(this, ret.data)
+        }
+      },
+      // 新增疾病史
+      onAddDiseasesHistory() {
+        const diseasesHistory = this.addUserInfo.diseasesHistory
+        diseasesHistory.push({
+          content: ''
+        })
+        this.addUserInfo.diseasesHistory = diseasesHistory
+      },
+      // 删除疾病史
+      onDeleteDiseasesHistory(index) {
+        const diseasesHistory = this.addUserInfo.diseasesHistory
+        diseasesHistory.splice(index, 1)
+        this.addUserInfo.diseasesHistory = diseasesHistory
+      },
+      // 新增重大疾病史
+      onAddMajorDiseasesHistory() {
+        const diseasesHistory = this.addUserInfo.majorDiseasesHistory
+        diseasesHistory.push({
+          content: ''
+        })
+        this.addUserInfo.majorDiseasesHistory = diseasesHistory
+      },
+      // 删除重大疾病史
+      onDeleteMajorDiseasesHistory(index) {
+        const diseasesHistory = this.addUserInfo.majorDiseasesHistory
+        diseasesHistory.splice(index, 1)
+        this.addUserInfo.majorDiseasesHistory = diseasesHistory
+      },
+      // 格式化关照等级
+      formatterCare(row) {
+        const { care_level } = row
+        let care_css = {
+          id: 0, name: '-', color: '#333333'
+        }
+        for (const item of this.care_list) {
+          if (care_level == item.id) {
+            care_css = item
+            break
+          }
+        }
+        return care_css
+      },
+      // 关照等级评级
+      async onGardeCareLevel(item) {
+        const check = await Confirm(this, '确认操作', '确定要自动评级吗?')
+        if (!check) {
+          return
+        }
+        const para = {
+          id: item.id
+        }
+        const ret = await serverPost(ToDJ('userCareLevelAi'), para)
+        if (ret.code === 0) {
+          const level = ret.data
+          NotifySuc(this, `评级成功: ${this.formatterCare({care_level: ret.data}).name}`)
+          this.getUserList()
+        } else {
+          NotifyFail(this, ret.data)
+        }
+      }
+    }
+  })
+</script>
+{% endblock %}

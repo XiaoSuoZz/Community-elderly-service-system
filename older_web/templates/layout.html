@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>社区老年人服务系统</title>
+	<link rel="stylesheet" href="/static/css/element.css">
+	<link rel="stylesheet" href="/static/css/all.css">
+	<script src="/static/js/vue.js"></script>
+	<script src="/static/js/axios.js"></script>
+	<script src="/static/js/helper.js"></script>
+	<script src="/static/js/element.js"></script>
+</head>
+<body>
+  <div class="app-warpper">
+		<div class="app-menu">
+			<div class="title">
+				<h3 class="menu-item">社区老年人服务系统</h3>
+			</div>
+			<div id="layout-menu">
+				<a href="../user" class="menu-item {% block user %}{% endblock %}">
+					<span slot="title">人员档案</span>
+				</a>
+				<a href="../appointment" class="menu-item {% block appointment %}{% endblock %}">
+					<span slot="title">预约服务</span>
+				</a>
+				<a href="../message_board" class="menu-item {% block message_board %}{% endblock %}">
+					<span slot="title">留言板</span>
+				</a>
+				<a href="../video" class="menu-item {% block video %}{% endblock %}">
+					<span slot="title">视频管理</span>
+				</a>
+				<a href="../news" class="menu-item {% block news %}{% endblock %}">
+					<span slot="title">新闻管理</span>
+				</a>
+				<a href="../login" class="menu-item">
+					<span slot="title">退出登录</span>
+				</a>
+			</div>
+		</div>
+		<div class="app-body">
+			<div class="app-header">
+				<div id="marquee-wrapper" class="marquee-wrapper">
+					<!-- 滚动字幕 -->
+				</div>
+				<div class="app-header-right">
+					<span id="user-name">user</span>
+					<span class="message-icon" onclick="onOpenDrawer()">
+						<img id="message-icon" src="/static/img/icon/message.png">
+					</span>
+				</div>
+			</div>
+			<div class="current-page">社区老年人服务系统 / {% block current-page %}{% endblock %}</div>
+			<div class="app-container">
+				{% block mainbody %}
+				{% endblock %}
+			</div>
+			<!-- 侧栏抽屉 -->
+			<div id="message-drawer" style="right: -400px;" class="drawer-wrapper">
+				<div class="drawer-header">系统消息
+					<img class="drawer-close-icon" src="/static/img/icon/close.png" onclick="onOpenDrawer()">
+				</div>
+				<div id="message-drawer-content" class="drawer-content">
+					
+				</div>
+			</div>
+		</div>
+  </div>
+  <script>
+		// 消息侧栏dom
+		const messageIconDom = document.getElementById('message-icon')
+		const drawerDom = document.getElementById('message-drawer')
+		const drawerContentDom = document.getElementById('message-drawer-content')
+		const renderMessageDom = (item) => {
+			let { id, name, create_time } = item
+			create_datetime = `${FormatDate(new Date(create_time))} ${FormatTime(new Date(create_time))}`
+			return `
+				<div class="message-item">
+					<div class="message-sign">呼救</div>
+					<div class="message-project">老人：${item.user_info.name}</div>
+					<div class="message-project">紧急联系人：${item.user_info.emergency_contact_name}</div>
+					<div class="message-project">联系人关系：${item.user_info.emergency_contact_relationship}</div>
+					<div class="message-project">联系人电话：${item.user_info.emergency_contact_phone}</div>
+					<div class="message-footer">
+						<div class="message-time">时间: ${create_datetime}</div>
+						<div class="message-btn" onclick="onClickMessage(${id})">已处理</div>	
+					</div>
+				</div>
+			`
+		}
+		let instantCallList = []
+		let instantCallTimer = null
+		// 获取消息
+		const getMessage = async () => {
+			const res = await serverPost(ToDJ('instantCallList'), {})
+			if (res.code === 0) {
+				const list = res.data
+				if (list.length === 0) {
+					drawerContentDom.innerHTML = '<div class="message-empty">暂无消息</div>'
+					document.getElementById("marquee-wrapper").innerHTML = ''
+					return	
+				} else {
+					if (instantCallList.length == 0 || list[0].id != instantCallList[0].id) {
+						const { name, area_detail } = list[0].user_info
+						document.getElementById("marquee-wrapper").innerHTML = `
+						<marquee bgcolor="transparent" scrollamount="5" style="color: red; font-size: 16px; padding: 5px;">家住 ${area_detail} 的 ${name} 老人正在呼叫, 请及时处理</marquee>
+						`
+					}
+				}
+				let drawerDomStr = ''
+				instantCallList = list
+				for (const item of list) {
+					drawerDomStr += renderMessageDom(item)
+				}
+				drawerContentDom.innerHTML = drawerDomStr
+				messageIconDom.setAttribute("src", '/static/img/icon/message_s.png')
+			}
+		}
+		if (instantCallTimer) {
+			clearInterval(instantCallTimer)
+		}
+		instantCallTimer = setInterval(() => {
+			getMessage()
+		}, 4000)
+    let userInfo = window.localStorage.getItem("older_loginInfo")
+    if (userInfo) {
+      userInfo = JSON.parse(userInfo)
+      document.getElementById('user-name').innerHTML = userInfo.name
+    }
+		// 打开 关闭 消息侧边栏
+		const onOpenDrawer = () => {
+			if (drawerDom.style.right === '-400px') {
+				drawerDom.style.right = 0;
+			} else {
+				drawerDom.style.right = '-400px'
+			}
+		}
+		// 点击消息
+		const onClickMessage = async (id) => {
+			console.log("onClickMessage:", id)
+			const res = await serverPost(ToDJ('instantCallDeal'), {id})
+			if (res.code === 0) {
+				getMessage()
+			}
+		}
+  </script>
+</body>

@@ -1,0 +1,20 @@
+服务器后端+后台管理系统前端：
+older: 后端模块
+  _init_.py： 框架自带文件不用动
+  asgi.py： 框架自带文件不用动
+  models.py： 定义项目用到的数据类型，简单理解就是映射数据库中各个表的
+  serializes.py：对models中定义的元数据进行序列化的方法
+  settings.py：项目配置文件，主要注意80行左右的配置数据库的内容
+  urls.py：后端路由文件，前端发送请求的时候会带请求地址例如http:www.baidu.com/findData, 这个文件就是根据请求地址将请求分流到具体某个文件的某个方法（api）去处理请求，所有请求都会通过这个文件被分流
+  view_xxx.py：各个模块的api文件，比如view_appointment.py 里面全是预约相关的接口
+  views.py：处理页面请求的api文件，返回的不是数据而是templates中的前端页面
+  wsgi.py： 框架自带文件不用动
+static：前端静态文件夹（css js 图片资源）
+templates：前端页面（html）
+manage.py: django项目启动入口
+
+1. urls.py: 网关，关联到对应的views.py中的一个函数，声明请求url的映射关系
+2. asgi.py / wsgi.py:  Python程序和Web服务器的通信协议
+3. manage.py: 命令行工具，用来和Django项目进行交互
+4. setting.py: 项目配置文件
+5. init.py: 声明所在目录的包为一个python包

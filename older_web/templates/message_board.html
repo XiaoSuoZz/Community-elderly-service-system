@@ -1,0 +1,107 @@
+{%extends "layout.html" %}
+<!-- 导航标记 -->
+{% block message_board %}active{% endblock %}
+{% block current-page %}留言板{% endblock %}
+<!-- 内容区 -->
+{% block mainbody %}
+{% verbatim %}
+<div id="app" class="container">
+  <div class="content-wrapper">
+    <el-table :data="list" style="width: 100%">
+      <el-table-column prop="id" label="id" width="100"></el-table-column>
+      <el-table-column prop="message" label="留言内容"></el-table-column>
+      <el-table-column prop="user_name" label="留言用户" width="100"></el-table-column>
+      <el-table-column prop="user_phone" label="联系方式" width="130"></el-table-column>
+      <el-table-column :formatter="formatStatus" prop="status" label="状态" width="130"></el-table-column>
+      <el-table-column prop="create_time" label="留言时间" width="100" align="center"></el-table-column>
+      <el-table-column align="right" label="操作" width="100">
+        <template slot-scope="{ row }">
+          <el-button type="text" :disabled="row.status!=1" @click="onDeal(row)">处理</el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+    <el-pagination ref="page" :total="page.total_count" :page-size="page.page_size" class="app-pagination"
+      layout="prev, pager, next, jumper"
+      hide-on-single-page
+      @current-change="onChangePage">
+    </el-pagination>
+  </div>
+</div>
+{% endverbatim %}
+<script>
+  let id = 0;
+  new Vue({
+    el: '#app',
+    data() {
+      return {
+        // 分页
+        page: {
+          page_index: 1,
+          page_size: 5,
+          total_count: 0
+        },
+        list: [],
+        status_list: [
+          { id: 1, name: '待处理' },
+          { id: 2, name: '已处理' }
+        ]
+      }
+    },
+    mounted() {
+      this.searchList()
+    },
+    methods: {
+      // 查询视频列表
+      searchList() {
+        this.page = {
+          page_index: 1,
+          page_size: 5,
+          total_count: 0
+        }
+        this.getList()
+      },
+      // 获取列表
+      async getList() {
+        const ret = await serverPost(ToDJ('messageBoardList'), this.page)
+        if (ret.code === 0) {
+          const { list, total_count } = ret.data
+          this.page.total_count = total_count
+          for (const item of list) {
+            item.create_time = FormatDate(new Date(item.create_time))
+          }
+          this.list = list
+        } else {
+          NotifyFail(this, ret.data)
+        }
+      },
+      // 翻页
+      onChangePage(index) {
+        this.page.page_index = index
+        this.getList()
+      },
+      // 处理
+      async onDeal(item) {
+        const { id, user_name } = item
+        const check = await Confirm(this, '确认处理', '您已联系用户反馈了吗？')
+        if (!check) return
+        const ret = await serverPost(ToDJ('messageBoardDeal'), { id })
+        if (ret.code === 0) {
+          NotifySuc(this, '处理成功')
+          this.searchList()
+        } else {
+          NotifyFail(this, ret.data)
+        }
+      },
+      formatStatus(row) {
+        let name = '-'
+        for (const item of this.status_list) {
+          if (item.id == row.status) {
+            return item.name
+          }
+        }
+        return name
+      }
+    }
+  })
+</script>
+{% endblock %}

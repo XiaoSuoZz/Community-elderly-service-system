@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>社区老年人服务系统</title>
+	<link rel="stylesheet" href="/static/css/element.css">
+	<link rel="stylesheet" href="/static/css/login.css">
+	<script src="/static/js/vue.js"></script>
+	<script src="/static/js/axios.js"></script>
+	<script src="/static/js/helper.js"></script>
+	<script src="/static/js/element.js"></script>
+	<style></style>
+</head>
+<body>
+  <div id="app">
+    <!-- 登陆表单 -->
+    <div class="login-container">
+      <el-form ref="loginForm" :model="loginInfo" class="login-form" label-position="left">
+        <div class="title-container">
+          <h1 class="title">登录</h1>
+        </div>
+        <el-form-item>
+          <el-input  v-model="loginInfo.account" placeholder="账户" @keyup.native.enter="onLogin"/>
+        </el-form-item>
+        <el-form-item>
+          <el-input ref="password" v-model="loginInfo.password" placeholder="密码" type="password" @keyup.native.enter="onLogin"/>
+        </el-form-item>
+        <el-form-item >
+          <el-button style="width: 100%;" type="primary" @click="onLogin()">登录</el-button>
+        </el-form-item>
+      </el-form>
+    </div>
+    <!-- copyright -->
+    <div class="copyright">copyright©测试项目</div>
+  </div>
+</body>
+<!-- 脚本 -->
+<script>
+  new Vue({
+    el: '#app',
+    data() {
+      return {
+        loginInfo: {
+          account: '',
+          password: ''
+        }
+      }
+    },
+    mounted() {
+      let userInfo = window.localStorage.getItem("older_loginInfo")
+      if (userInfo) {
+        userInfo = JSON.parse(userInfo)
+        const { account, password } = userInfo
+        this.loginInfo = { account, password }
+      }
+    },
+    methods: {
+      // 登陆
+      async onLogin() {
+        const { account, password } = this.loginInfo
+        if (!account || !password) {
+          NotifyFail(this, '请输入账户、密码')
+          return
+        }
+        // 用户登陆
+        const res = await serverPost(ToDJ('staffLogin'), {account, password})
+        if (res.code === 0) {
+          NotifySuc(this, "登陆成功")
+          window.localStorage.setItem("older_loginInfo", JSON.stringify(res.data))
+          window.location.href = `/user`
+        } else {
+          NotifyFail(this, res.data)
+        }
+      }
+    }
+  })
+</script>

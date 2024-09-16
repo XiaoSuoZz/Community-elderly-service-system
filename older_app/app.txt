@@ -1,0 +1,16 @@
+app前端：
+api：存放所有api
+components：存放组件，这里只有一个登录面板的组件，可以先不看
+config：项目配置文件，主要配置了往后端发送请求的地址
+node_modules：node项目的包文件，里面全是依赖包，npm install后自动生成的，不用管
+pages：用于存放各个页面
+static：静态文件，主要是图片图标
+store：vue项目的状态管理文件，用于引用api，设置全局变量
+unpackage：不用管
+utils：项目通用工具，比如时间格式化工具，http请求工具之类的
+APP.vue：vue项目的启动入口
+main.js：vue项目的全局文件
+后面几个都是node项目包管理文件，不用管
+
+主要内容在page文件夹中
+

@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "服务记录",
+  "enablePullDownRefresh": false,
+  "usingComponents": {
+    "u-empty": "/node-modules/uview-ui/components/u-empty/u-empty"
+  }
+}

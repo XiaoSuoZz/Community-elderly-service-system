@@ -1,0 +1,347 @@
+html {
+  width: 100%;
+  height: 100%;
+}
+body {
+  width: 100%;
+  height: 100%;
+  background-color: #fff;
+  color: #181818;
+}
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+#app {
+  width: 100%;
+  height: 100%;
+}
+.container {
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+.container .filter-container {
+  width: 100%;
+  display: flex;
+  justify-content: end;
+}
+.container .filter-container .filter-item {
+  margin-left: 10px;
+}
+.flex {
+  display: flex;
+}
+.flex-row {
+  flex-direction: row;
+}
+.flex-col {
+  flex-direction: column;
+}
+.flex-start {
+  justify-content: flex-start;
+}
+.flex-jc-end {
+  justify-content: flex-end;
+}
+.flex-jc-center {
+  justify-content: center;
+}
+.flex-jc-sp-around {
+  justify-content: space-around;
+}
+.flex-jc-sp-between {
+  justify-content: space-between;
+}
+.flex-jc-sp-evenly {
+  justify-content: space-evenly;
+}
+.flex-ai-center {
+  align-items: center;
+}
+.flex-ai-start {
+  align-items: flex-start;
+}
+.flex-ai-end {
+  align-items: flex-end;
+}
+.app-warpper {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  overflow: hidden;
+}
+.app-warpper .app-menu {
+  width: 200px;
+  height: 100%;
+  background-color: #f7f7f7;
+}
+.app-warpper .app-menu .title {
+  width: 100%;
+  text-align: center;
+}
+.app-warpper .app-menu .menu-item {
+  width: 200px;
+  height: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #181818;
+  text-decoration: none;
+}
+.app-warpper .app-menu .menu-item.active {
+  color: #00b0ed;
+}
+.app-warpper .app-menu .menu-item:hover {
+  color: #4cc8f2;
+}
+.app-warpper .app-body {
+  width: calc(100% - 200px);
+  height: 100%;
+  position: relative;
+}
+.app-warpper .app-body .app-header {
+  width: 100%;
+  height: 50px;
+  padding: 0 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #000;
+  background-color: #fff;
+  border-bottom: 1px solid #eee;
+  z-index: 2;
+}
+.app-warpper .app-body .app-header .marquee-wrapper {
+  width: 400px;
+  height: 22px;
+}
+.app-warpper .app-body .app-header .app-header-right {
+  display: flex;
+  align-items: center;
+}
+.app-warpper .app-body .app-header .app-header-right .message-icon {
+  cursor: pointer;
+  margin-left: 10px;
+  width: 20px;
+  height: 20px;
+}
+.app-warpper .app-body .app-header .app-header-right .message-icon:hover {
+  background-color: rgba(0, 0, 0, 0.2);
+}
+.app-warpper .app-body .app-header .app-header-right .message-icon #message-icon {
+  width: 100%;
+  height: 100%;
+}
+.app-warpper .app-body .current-page {
+  width: 100%;
+  height: 40px;
+  padding: 0 10px;
+  line-height: 40px;
+  background-color: #fff;
+  color: #999;
+}
+.app-warpper .app-body .app-container {
+  width: 100%;
+  height: calc(100% - 90px);
+  padding: 10px;
+}
+.app-warpper .app-body .app-container .content-wrapper {
+  width: 100%;
+}
+.app-warpper .app-body .drawer-wrapper {
+  position: absolute;
+  top: 50px;
+  right: -400px;
+  width: 300px;
+  padding: 10px 0;
+  box-sizing: border-box;
+  overflow-x: hidden;
+  overflow-y: auto;
+  transition: right 500ms;
+  height: calc(100% - 50px);
+  z-index: 1;
+  background-color: #f7f7f7;
+  box-shadow: rgba(0, 0, 0, 0.2) 0px 8px 10px -5px, rgba(0, 0, 0, 0.14) 0px 16px 24px 2px, rgba(0, 0, 0, 0.12) 0px 6px 30px 5px;
+}
+.app-warpper .app-body .drawer-wrapper .drawer-header {
+  width: 100%;
+  height: 32px;
+  padding: 0 10px;
+  color: #333;
+  padding-bottom: 10px;
+  border-bottom: solid 1px #eee;
+}
+.app-warpper .app-body .drawer-wrapper .drawer-header .drawer-close-icon {
+  cursor: pointer;
+  margin-top: 2px;
+  width: 14px;
+  height: 14px;
+  float: right;
+}
+.app-warpper .app-body .drawer-wrapper .drawer-header .drawer-close-icon:hover {
+  background-color: rgba(0, 0, 0, 0.2);
+}
+.app-warpper .app-body .drawer-wrapper .drawer-content {
+  width: 100%;
+  height: calc(100% - 32px);
+  overflow-x: hidden;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+.app-warpper .app-body .drawer-wrapper .drawer-content .message-empty {
+  width: 100%;
+  text-align: center;
+  margin-top: 40px;
+  font-size: 30px;
+  color: #ccc;
+}
+.app-warpper .app-body .drawer-wrapper .drawer-content .message-item {
+  cursor: pointer;
+  width: 100%;
+  padding: 5px 10px;
+  border-bottom: solid 1px #ccc;
+  color: #333;
+  position: relative;
+  overflow: hidden;
+}
+.app-warpper .app-body .drawer-wrapper .drawer-content .message-item .message-sign {
+  position: absolute;
+  top: 5px;
+  right: -20px;
+  background-color: #ccc;
+  color: #fff;
+  font-weight: bold;
+  padding: 5px 20px;
+  transform: rotate(45deg);
+  font-size: 12px;
+}
+.app-warpper .app-body .drawer-wrapper .drawer-content .message-item .message-sign.blue {
+  background-color: #00b0ed;
+}
+.app-warpper .app-body .drawer-wrapper .drawer-content .message-item .message-sign.orange {
+  background-color: #FF8533;
+}
+.app-warpper .app-body .drawer-wrapper .drawer-content .message-item:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+.app-warpper .app-body .drawer-wrapper .drawer-content .message-item .message-project {
+  font-weight: bold;
+  line-height: 30px;
+}
+.app-warpper .app-body .drawer-wrapper .drawer-content .message-item .message-content {
+  color: #666;
+  text-indent: 20px;
+}
+.app-warpper .app-body .drawer-wrapper .drawer-content .message-item .message-footer {
+  color: #999;
+  width: 100%;
+  font-size: 13px;
+  line-height: 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.app-warpper .app-body .drawer-wrapper .drawer-content .message-item .message-footer .message-btn {
+  width: 90px;
+  background-color: #072A71;
+  border-radius: 4px;
+  color: #fff;
+  text-align: center;
+  line-height: 24px;
+}
+.container .top-panel {
+  width: 100%;
+  background-color: #fff;
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+}
+.container .top-panel .panel-header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+}
+.container .top-panel .panel-header .panel-title {
+  font-weight: bold;
+}
+.container .top-panel .panel-header .panel-filter {
+  display: flex;
+}
+.container .top-panel .panel-header .panel-filter > * {
+  margin-left: 10px;
+}
+.container .top-panel .add-wrapper {
+  width: 100%;
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.container .top-panel .query-more {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+.container .top-panel .query-more .query-teim {
+  margin-right: 10px;
+  max-width: 160px;
+}
+.container .top-panel .query-more .el-date-editor.el-input,
+.container .top-panel .query-more .el-date-editor.el-input__inner {
+  max-width: 160px;
+}
+.ticket-info-wrapper {
+  width: 100%;
+}
+.ticket-info-wrapper .ticket-header {
+  width: 100%;
+  height: 40px;
+  background-color: #072A71;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  padding: 30px;
+  font-size: 18px;
+}
+.ticket-info-wrapper .ticket-content {
+  width: 100%;
+  display: flex;
+  padding: 10px;
+}
+.ticket-info-wrapper .ticket-content .left,
+.ticket-info-wrapper .ticket-content .right {
+  width: 50%;
+}
+.ticket-info-wrapper .ticket-content .left .info-item,
+.ticket-info-wrapper .ticket-content .right .info-item {
+  width: 100%;
+}
+.ticket-info-wrapper .ticket-content .left .info-item .label,
+.ticket-info-wrapper .ticket-content .right .info-item .label {
+  display: inline-block;
+  width: 60px;
+  text-align-last: justify;
+  font-weight: bold;
+}
+.address-cell {
+  width: 200px;
+}
+.address-cell .detail {
+  color: #333;
+}
+.address-cell .area {
+  font-size: 12px;
+  font-weight: bold;
+}
+.user-form-title {
+  color: #999999;
+  font-size: 14px;
+  padding-top: 20px;
+  padding-bottom: 10px;
+}
+.diseases-input-wrapper {
+  margin-bottom: 5px;
+}

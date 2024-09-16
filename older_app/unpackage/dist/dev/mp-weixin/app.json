@@ -1,0 +1,59 @@
+{
+  "pages": [
+    "pages/welcome/welcome",
+    "pages/login/login",
+    "pages/login/register",
+    "pages/index/index",
+    "pages/news/news",
+    "pages/video/video",
+    "pages/serve/serve",
+    "pages/my/my",
+    "pages/news/detail/detail",
+    "pages/video/detail/detail",
+    "pages/serve/appointment/appointment",
+    "pages/my/info/info",
+    "pages/my/advice/advice",
+    "pages/my/favorite/favorite",
+    "pages/my/record/record"
+  ],
+  "subPackages": [],
+  "window": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "uni-app",
+    "navigationBarBackgroundColor": "#F8F8F8",
+    "backgroundColor": "#333333"
+  },
+  "tabBar": {
+    "color": "#3D3D3D",
+    "selectedColor": "#39CCCC",
+    "backgroundColor": "#FFFFFF",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/serve/serve",
+        "iconPath": "static/tabbar/serve.png",
+        "selectedIconPath": "static/tabbar/serve_s.png",
+        "text": "服务"
+      },
+      {
+        "pagePath": "pages/news/news",
+        "iconPath": "static/tabbar/news.png",
+        "selectedIconPath": "static/tabbar/news_s.png",
+        "text": "新闻"
+      },
+      {
+        "pagePath": "pages/video/video",
+        "iconPath": "static/tabbar/video.png",
+        "selectedIconPath": "static/tabbar/video_s.png",
+        "text": "视频"
+      },
+      {
+        "pagePath": "pages/my/my",
+        "iconPath": "./static/tabbar/my.png",
+        "selectedIconPath": "./static/tabbar/my_s.png",
+        "text": "我的"
+      }
+    ]
+  },
+  "usingComponents": {}
+}

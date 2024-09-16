@@ -1,0 +1,85 @@
+{%extends "layout.html" %}
+<!-- 导航标记 -->
+{% block appointment %}active{% endblock %}
+{% block current-page %}预约服务{% endblock %}
+<!-- 内容区 -->
+{% block mainbody %}
+{% verbatim %}
+<div id="app" class="container">
+  <div class="content-wrapper">
+    <el-table :data="list" style="width: 100%">
+      <el-table-column prop="id" label="id" width="100"></el-table-column>
+      <el-table-column prop="user_name" label="预约用户" width="100"></el-table-column>
+      <el-table-column prop="type_str" label="服务类型" width="100"></el-table-column>
+      <el-table-column prop="detail" show-overflow-tooltip	 label="备注" width="100"></el-table-column>
+      <el-table-column prop="user_phone" label="联系方式" width="130"></el-table-column>
+      <el-table-column prop="user_address" label="地址"></el-table-column>
+      <el-table-column prop="date" label="预约日期" width="150" align="center"></el-table-column>
+      <el-table-column prop="time" label="预约时间" width="150" align="center"></el-table-column>
+    </el-table>
+    <el-pagination ref="page" :total="page.total_count" :page-size="page.page_size" class="app-pagination"
+      layout="prev, pager, next, jumper"
+      hide-on-single-page
+      @current-change="onChangePage">
+    </el-pagination>
+  </div>
+</div>
+{% endverbatim %}
+<script>
+  let id = 0;
+  new Vue({
+    el: '#app',
+    data() {
+      return {
+        // 分页
+        page: {
+          page_index: 1,
+          page_size: 10,
+          total_count: 0
+        },
+        list: [],
+				typeList: [
+					{ id: 1, name: '家政服务' },
+					{ id: 2, name: '医疗服务' },
+					{ id: 3, name: '药品配送' },
+					{ id: 4, name: '代买购物' }
+				],
+      }
+    },
+    mounted() {
+      this.searchList()
+    },
+    methods: {
+      // 查询视频列表
+      searchList() {
+        this.page = {
+          page_index: 1,
+          page_size: 10,
+          total_count: 0
+        }
+        this.getList()
+      },
+      // 获取列表
+      async getList() {
+        const ret = await serverPost(ToDJ('appointmentList'), this.page)
+        if (ret.code === 0) {
+          const { list, total_count } = ret.data
+          this.page.total_count = total_count
+          for (const item of list) {
+            item.create_time = FormatDate(new Date(item.create_time))
+            item.type_str = this.typeList.find(type => type.id == item.type).name
+          }
+          this.list = list
+        } else {
+          NotifyFail(this, ret.data)
+        }
+      },
+      // 翻页
+      onChangePage(index) {
+        this.page.page_index = index
+        this.getList()
+      }
+    }
+  })
+</script>
+{% endblock %}
